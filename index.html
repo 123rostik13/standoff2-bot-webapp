@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standoff 2 Кликер</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .balance {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .balance-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .clicker-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: transform 0.2s;
+        }
+        
+        .shop-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        
+        .btn-buy {
+            background: var(--success);
+        }
+        
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        
+        .withdraw-section {
+            margin-top: 20px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Standoff 2 Кликер</h1>
+            <p>Зарабатывай рубли и покупай голду!</p>
+        </header>
+        
+        <div class="card">
+            <div class="balance">
+                <div>
+                    <div>💵 Рублей</div>
+                    <div class="balance-value" id="rubles">1000</div>
+                </div>
+                <div>
+                    <div>🟡 Голды в инвентаре</div>
+                    <div class="balance-value" id="totalGolda">0</div>
+                </div>
+            </div>
+            
+            <button class="clicker-btn" id="clickBtn">КЛИК!</button>
+            <p style="text-align: center;">+1-5 рублей за клик</p>
+        </div>
+        
+        <div class="card">
+            <h2>🛒 Магазин голды</h2>
+            <div id="shopItems"></div>
+        </div>
+        
+        <div class="card">
+            <h2>🎒 Инвентарь</h2>
+            <div id="inventory"></div>
+            
+            <div class="withdraw-section">
+                <h3>📤 Вывод голды</h3>
+                <input type="text" class="form-input" id="nicknameInput" placeholder="Ваш ник в Standoff 2">
+                <button class="btn" id="withdrawBtn">Вывести всю голду</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация
+        const goldaPackages = {
+            100: { price: 10000 },
+            500: { price: 45000 },
+            1000: { price: 85000 },
+            3000: { price: 240000 }
+        };
+        
+        // Состояние
+        const state = {
+            rubles: 1000,
+            inventory: {},
+            isWebApp: window.Telegram && Telegram.WebApp
+        };
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (state.isWebApp) {
+                Telegram.WebApp.expand();
+                Telegram.WebApp.ready();
+                await loadUserData();
+            }
+            
+            renderShop();
+            renderInventory();
+            setupEventListeners();
+        });
+        
+        async function loadUserData() {
+            try {
+                const userId = new URLSearchParams(window.location.search).get('user_id');
+                const response = await fetch(`/get_user_data?user_id=${userId}`);
+                const data = await response.json();
+                
+                state.rubles = data.rubles;
+                state.inventory = JSON.parse(data.inventory || '{}');
+                
+                updateUI();
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+            }
+        }
+        
+        function renderShop() {
+            const shopEl = document.getElementById('shopItems');
+            shopEl.innerHTML = '';
+            
+            Object.entries(goldaPackages).forEach(([amount, data]) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'shop-item';
+                
+                itemEl.innerHTML = `
+                    <div>
+                        <strong>${amount} 🟡</strong>
+                        <div>${data.price.toLocaleString()} ₽</div>
+                    </div>
+                    <button class="btn btn-buy" onclick="buyGolda(${amount})" 
+                        ${state.rubles < data.price ? 'disabled' : ''}>
+                        Купить
+                    </button>
+                `;
+                
+                shopEl.appendChild(itemEl);
+            });
+        }
+        
+        function renderInventory() {
+            const inventoryEl = document.getElementById('inventory');
+            
+            if (Object.keys(state.inventory).length === 0) {
+                inventoryEl.innerHTML = '<p>Ваш инвентарь пуст</p>';
+                document.getElementById('totalGolda').textContent = '0';
+                return;
+            }
+            
+            let total = 0;
+            inventoryEl.innerHTML = '';
+            
+            Object.entries(state.inventory).forEach(([amount, count]) => {
+                total += parseInt(amount) * count;
+                
+                const itemEl = document.createElement('div');
+                itemEl.className = 'inventory-item';
+                itemEl.innerHTML = `
+                    <div>${amount} 🟡 × ${count}</div>
+                    <div>${amount * count} 🟡</div>
+                `;
+                
+                inventoryEl.appendChild(itemEl);
+            });
+            
+            document.getElementById('totalGolda').textContent = total;
+        }
+        
+        function updateUI() {
+            document.getElementById('rubles').textContent = state.rubles;
+            renderInventory();
+            renderShop();
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('clickBtn').addEventListener('click', () => {
+                const rublesToAdd = Math.floor(Math.random() * 5) + 1;
+                state.rubles += rublesToAdd;
+                
+                if (state.isWebApp) {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'click',
+                        amount: rublesToAdd
+                    }));
+                }
+                
+                updateUI();
+            });
+            
+            document.getElementById('withdrawBtn').addEventListener('click', () => {
+                const nickname = document.getElementById('nicknameInput').value.trim();
+                const totalGolda = Object.entries(state.inventory).reduce(
+                    (sum, [amount, count]) => sum + parseInt(amount) * count, 0
+                );
+                
+                if (!nickname) {
+                    alert('Введите ваш игровой ник!');
+                    return;
+                }
+                
+                if (totalGolda === 0) {
+                    alert('Нет голды для вывода!');
+                    return;
+                }
+                
+                if (confirm(`Вывести ${totalGolda} 🟡 на ник ${nickname}?`)) {
+                    if (state.isWebApp) {
+                        Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'withdraw',
+                            nickname: nickname
+                        }));
+                    }
+                    
+                    state.inventory = {};
+                    updateUI();
+                    alert('Запрос на вывод отправлен!');
+                }
+            });
+        }
+        
+        function buyGolda(amount) {
+            const price = goldaPackages[amount].price;
+            
+            if (state.rubles >= price) {
+                state.rubles -= price;
+                state.inventory[amount] = (state.inventory[amount] || 0) + 1;
+                
+                if (state.isWebApp) {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'buy_golda',
+                        package: amount
+                    }));
+                }
+                
+                updateUI();
+                alert(`Куплено ${amount} 🟡!`);
+            } else {
+                alert('Недостаточно рублей!');
+            }
+        }
+        
+        // Глобальные функции
+        window.buyGolda = buyGolda;
+    </script>
+</body>
+</html>
