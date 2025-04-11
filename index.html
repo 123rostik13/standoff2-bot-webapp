@@ -14,26 +14,22 @@
             --success: #4cc9f0;
             --warning: #f8961e;
         }
-        
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             padding: 20px;
             color: var(--dark);
         }
-        
         .container {
             max-width: 800px;
             margin: 0 auto;
         }
-        
         header {
             background: var(--primary);
             color: white;
@@ -43,7 +39,6 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        
         .card {
             background: white;
             border-radius: 10px;
@@ -51,13 +46,11 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
         .balance-container {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
         }
-        
         .balance-card {
             background: var(--light);
             border-radius: 8px;
@@ -65,18 +58,11 @@
             width: 48%;
             text-align: center;
         }
-        
         .balance-value {
             font-size: 1.8rem;
             font-weight: bold;
             margin-top: 5px;
         }
-        
-        .clicker-section {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
         .clicker-btn {
             background: var(--accent);
             color: white;
@@ -86,18 +72,13 @@
             height: 150px;
             font-size: 1.5rem;
             cursor: pointer;
+            margin: 20px auto;
+            display: block;
             transition: transform 0.2s;
-            box-shadow: 0 6px 10px rgba(0,0,0,0.1);
         }
-        
         .clicker-btn:active {
             transform: scale(0.95);
         }
-        
-        .shop-section {
-            margin-top: 30px;
-        }
-        
         .shop-item {
             display: flex;
             justify-content: space-between;
@@ -105,11 +86,6 @@
             padding: 12px 0;
             border-bottom: 1px solid #eee;
         }
-        
-        .shop-item-title {
-            font-weight: bold;
-        }
-        
         .btn {
             background: var(--primary);
             color: white;
@@ -119,75 +95,36 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        
-        .btn:hover {
-            background: var(--secondary);
-        }
-        
         .btn-buy {
             background: var(--success);
         }
-        
         .btn-buy:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
-        .inventory-section {
-            margin-top: 20px;
+        #notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-        
-        .inventory-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-        }
-        
-        .settings-section {
-            margin-top: 25px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
+        .notification {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            margin-bottom: 10px;
             border-radius: 5px;
-            font-size: 1rem;
+            animation: fadeIn 0.3s;
         }
-        
-        .id-status {
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-        
-        .valid {
-            color: var(--success);
-        }
-        
-        .invalid {
-            color: var(--warning);
-        }
-        
-        .withdraw-btn {
-            background: var(--warning);
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
-            margin-top: 15px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
+    <div id="notifications"></div>
+    
     <div class="container">
         <header>
             <h1>🎮 Standoff 2 Кликер</h1>
@@ -206,37 +143,23 @@
                 </div>
             </div>
             
-            <div class="clicker-section">
-                <button class="clicker-btn" id="clickBtn">КЛИК!</button>
-                <p>+1-5 рублей за каждый клик</p>
-            </div>
+            <button class="clicker-btn" id="clickBtn">КЛИК!</button>
+            <p style="text-align: center;">+1-5 рублей за клик</p>
         </div>
         
-        <div class="card shop-section">
+        <div class="card">
             <h2>🛒 Магазин голды</h2>
-            <div id="shopItems">
-                <!-- Товары будут добавлены через JS -->
-            </div>
+            <div id="shopItems"></div>
         </div>
         
-        <div class="card inventory-section">
-            <h2>🎒 Инвентарь</h2>
-            <div id="inventory">
-                <p>Пока ничего нет</p>
-            </div>
-        </div>
-        
-        <div class="card settings-section">
+        <div class="card">
             <h2>⚙️ Настройки</h2>
-            
-            <div class="form-group">
-                <label for="so2IdInput" class="form-label">Ваш ID в Standoff 2:</label>
-                <input type="text" class="form-input" id="so2IdInput" placeholder="Введите цифровой ID" maxlength="9">
-                <div class="id-status" id="idStatus">Не указан</div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Ваш ID Standoff 2:</label>
+                <input type="text" id="so2IdInput" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                <button class="btn" id="saveIdBtn" style="margin-top: 10px;">Сохранить ID</button>
             </div>
-            
-            <button class="btn" id="saveIdBtn">Сохранить ID</button>
-            <button class="btn withdraw-btn" id="withdrawBtn">Вывести всю голду</button>
+            <button class="btn" id="withdrawBtn" style="background: var(--warning); width: 100%;">Вывести голду</button>
         </div>
     </div>
 
@@ -262,31 +185,64 @@
         const goldaEl = document.getElementById('golda');
         const clickBtn = document.getElementById('clickBtn');
         const shopItemsEl = document.getElementById('shopItems');
-        const inventoryEl = document.getElementById('inventory');
         const so2IdInput = document.getElementById('so2IdInput');
-        const idStatus = document.getElementById('idStatus');
         const saveIdBtn = document.getElementById('saveIdBtn');
         const withdrawBtn = document.getElementById('withdrawBtn');
         
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (state.isWebApp) {
-                Telegram.WebApp.expand();
-                Telegram.WebApp.ready();
-            }
+        // Уведомления
+        function showNotification(message, isSuccess = true) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.style.background = isSuccess ? '#4CAF50' : '#F44336';
             
-            await loadUserData();
-            renderShop();
-            renderInventory();
-            setupEventListeners();
-        });
+            const notifications = document.getElementById('notifications');
+            notifications.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
         
-        // Загрузка данных пользователя
-        async function loadUserData() {
+        // Сохранение состояния
+        async function saveState() {
+            const userId = new URLSearchParams(window.location.search).get('user_id');
+            if (!userId) return;
+            
             try {
-                const userId = new URLSearchParams(window.location.search).get('user_id');
-                if (!userId) return;
-                
+                if (state.isWebApp) {
+                    await Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'sync_state',
+                        rubles: state.rubles,
+                        golda: state.golda
+                    }));
+                } else {
+                    const response = await fetch('/sync_data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            rubles: state.rubles,
+                            golda: state.golda
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('Ошибка сервера');
+                }
+                showNotification('Данные сохранены!');
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                showNotification('Ошибка сохранения', false);
+            }
+        }
+        
+        // Загрузка данных
+        async function loadUserData() {
+            const userId = new URLSearchParams(window.location.search).get('user_id');
+            if (!userId) return;
+            
+            try {
                 const response = await fetch(`/get_user_data?user_id=${userId}`);
                 if (!response.ok) throw new Error('Ошибка загрузки');
                 
@@ -297,14 +253,13 @@
                 
                 if (state.so2Id) {
                     so2IdInput.value = state.so2Id;
-                    updateIdStatus();
                 }
                 
                 updateUI();
             } catch (error) {
-                console.error('Ошибка загрузки данных:', error);
+                console.error('Ошибка загрузки:', error);
                 if (!state.isWebApp) {
-                    state.rubles = 1000; // Для теста вне Telegram
+                    state.rubles = 1000;
                     updateUI();
                 }
             }
@@ -315,7 +270,7 @@
             rublesEl.textContent = state.rubles;
             goldaEl.textContent = state.golda;
             renderShop();
-            renderInventory();
+            saveState();
         }
         
         // Рендер магазина
@@ -327,7 +282,7 @@
                 itemEl.className = 'shop-item';
                 
                 itemEl.innerHTML = `
-                    <div class="shop-item-title">${amount} 🟡</div>
+                    <div>${amount} 🟡</div>
                     <div>${data.price.toLocaleString()} ₽</div>
                     <button class="btn btn-buy" onclick="buyGolda(${amount})" 
                         ${state.rubles < data.price ? 'disabled' : ''}>
@@ -336,107 +291,6 @@
                 `;
                 
                 shopItemsEl.appendChild(itemEl);
-            });
-        }
-        
-        // Рендер инвентаря
-        function renderInventory() {
-            if (state.golda > 0) {
-                inventoryEl.innerHTML = `
-                    <div class="inventory-item">
-                        <div>🟡 Голда:</div>
-                        <div>${state.golda}</div>
-                    </div>
-                `;
-            } else {
-                inventoryEl.innerHTML = '<p>Пока ничего нет</p>';
-            }
-        }
-        
-        // Обновление статуса ID
-        function updateIdStatus() {
-            if (state.so2Id) {
-                idStatus.textContent = `ID сохранен: ${state.so2Id}`;
-                idStatus.className = 'id-status valid';
-            } else {
-                idStatus.textContent = 'ID не указан (требуется для вывода)';
-                idStatus.className = 'id-status invalid';
-            }
-        }
-        
-        // Настройка обработчиков событий
-        function setupEventListeners() {
-            // Кликер
-            clickBtn.addEventListener('click', async () => {
-                const rublesToAdd = Math.floor(Math.random() * 5) + 1;
-                state.rubles += rublesToAdd;
-                
-                if (state.isWebApp) {
-                    try {
-                        await Telegram.WebApp.sendData(JSON.stringify({
-                            action: 'click',
-                            amount: rublesToAdd
-                        }));
-                    } catch (error) {
-                        console.error('Ошибка отправки данных:', error);
-                    }
-                }
-                
-                updateUI();
-            });
-            
-            // Сохранение ID
-            saveIdBtn.addEventListener('click', async () => {
-                const so2Id = so2IdInput.value.trim();
-                
-                if (/^\d{6,9}$/.test(so2Id)) {
-                    state.so2Id = so2Id;
-                    
-                    if (state.isWebApp) {
-                        try {
-                            await Telegram.WebApp.sendData(JSON.stringify({
-                                action: 'set_so2_id',
-                                so2_id: so2Id
-                            }));
-                        } catch (error) {
-                            console.error('Ошибка сохранения ID:', error);
-                        }
-                    }
-                    
-                    updateIdStatus();
-                    alert('ID успешно сохранен!');
-                } else {
-                    alert('Введите корректный ID Standoff 2 (6-9 цифр)');
-                }
-            });
-            
-            // Вывод голды
-            withdrawBtn.addEventListener('click', async () => {
-                if (!state.so2Id) {
-                    alert('Сначала укажите ваш ID Standoff 2!');
-                    return;
-                }
-                
-                if (state.golda <= 0) {
-                    alert('Нет голды для вывода!');
-                    return;
-                }
-                
-                if (confirm(`Вывести ${state.golda} 🟡 на ID ${state.so2Id}?`)) {
-                    if (state.isWebApp) {
-                        try {
-                            await Telegram.WebApp.sendData(JSON.stringify({
-                                action: 'withdraw'
-                            }));
-                        } catch (error) {
-                            console.error('Ошибка вывода:', error);
-                        }
-                    }
-                    
-                    state.golda = 0;
-                    updateUI();
-                    alert('Запрос на вывод отправлен!');
-                }
             });
         }
         
@@ -460,11 +314,92 @@
                 }
                 
                 updateUI();
-                alert(`Успешно куплено ${amount} 🟡!`);
+                showNotification(`Куплено ${amount} голды!`);
             } else {
-                alert('Недостаточно рублей!');
+                showNotification('Недостаточно рублей!', false);
             }
         };
+        
+        // Обработчики событий
+        clickBtn.addEventListener('click', async () => {
+            const rublesToAdd = Math.floor(Math.random() * 5) + 1;
+            state.rubles += rublesToAdd;
+            
+            if (state.isWebApp) {
+                try {
+                    await Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'click',
+                        amount: rublesToAdd
+                    }));
+                } catch (error) {
+                    console.error('Ошибка клика:', error);
+                }
+            }
+            
+            updateUI();
+            showNotification(`+${rublesToAdd} рублей!`);
+        });
+        
+        saveIdBtn.addEventListener('click', async () => {
+            const so2Id = so2IdInput.value.trim();
+            
+            if (/^\d{6,9}$/.test(so2Id)) {
+                state.so2Id = so2Id;
+                
+                if (state.isWebApp) {
+                    try {
+                        await Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'set_so2_id',
+                            so2_id: so2Id
+                        }));
+                    } catch (error) {
+                        console.error('Ошибка сохранения ID:', error);
+                    }
+                }
+                
+                showNotification('ID сохранен!');
+            } else {
+                showNotification('ID должен содержать 6-9 цифр!', false);
+            }
+        });
+        
+        withdrawBtn.addEventListener('click', async () => {
+            if (!state.so2Id) {
+                showNotification('Сначала укажите ID Standoff 2!', false);
+                return;
+            }
+            
+            if (state.golda <= 0) {
+                showNotification('Нет голды для вывода!', false);
+                return;
+            }
+            
+            if (confirm(`Вывести ${state.golda} голды на ID ${state.so2Id}?`)) {
+                if (state.isWebApp) {
+                    try {
+                        await Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'withdraw',
+                            amount: state.golda,
+                            so2_id: state.so2Id
+                        }));
+                    } catch (error) {
+                        console.error('Ошибка вывода:', error);
+                    }
+                }
+                
+                state.golda = 0;
+                updateUI();
+                showNotification('Запрос на вывод отправлен!');
+            }
+        });
+        
+        // Инициализация
+        if (state.isWebApp) {
+            Telegram.WebApp.expand();
+            Telegram.WebApp.ready();
+        }
+        
+        loadUserData();
     </script>
 </body>
 </html>
