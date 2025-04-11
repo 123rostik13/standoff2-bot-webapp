@@ -105,7 +105,7 @@
             margin: 10px 0;
         }
         
-        .withdraw-section {
+        .settings-section {
             margin-top: 20px;
         }
         
@@ -115,6 +115,21 @@
             margin: 5px 0 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
+        }
+        
+        .id-status {
+            font-size: 0.9rem;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+        
+        .valid {
+            color: var(--success);
+        }
+        
+        .invalid {
+            color: var(--warning);
         }
     </style>
 </head>
@@ -149,11 +164,18 @@
         <div class="card">
             <h2>🎒 Инвентарь</h2>
             <div id="inventory"></div>
+        </div>
+        
+        <div class="card settings-section">
+            <h2>⚙️ Настройки</h2>
             
-            <div class="withdraw-section">
-                <h3>📤 Вывод голды</h3>
-                <input type="text" class="form-input" id="nicknameInput" placeholder="Ваш ник в Standoff 2">
-                <button class="btn" id="withdrawBtn">Вывести всю голду</button>
+            <label for="so2IdInput">Ваш ID в Standoff 2:</label>
+            <input type="text" class="form-input" id="so2IdInput" placeholder="Введите цифровой ID" maxlength="9">
+            <div class="id-status" id="idStatus">Не указан</div>
+            <button class="btn" id="saveIdBtn">Сохранить ID</button>
+            
+            <div style="margin-top: 20px;">
+                <button class="btn" id="withdrawBtn" style="width: 100%;">Вывести всю голду</button>
             </div>
         </div>
     </div>
@@ -171,8 +193,13 @@
         const state = {
             rubles: 1000,
             inventory: {},
+            so2Id: null,
             isWebApp: window.Telegram && Telegram.WebApp
         };
+        
+        // Элементы
+        const so2IdInput = document.getElementById('so2IdInput');
+        const idStatus = document.getElementById('idStatus');
         
         // Инициализация
         document.addEventListener('DOMContentLoaded', async () => {
@@ -185,6 +212,7 @@
             renderShop();
             renderInventory();
             setupEventListeners();
+            updateIdStatus();
         });
         
         async function loadUserData() {
@@ -195,8 +223,14 @@
                 
                 state.rubles = data.rubles;
                 state.inventory = JSON.parse(data.inventory || '{}');
+                state.so2Id = data.so2_id;
+                
+                if (state.so2Id) {
+                    so2IdInput.value = state.so2Id;
+                }
                 
                 updateUI();
+                updateIdStatus();
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
             }
@@ -259,7 +293,18 @@
             renderShop();
         }
         
+        function updateIdStatus() {
+            if (state.so2Id) {
+                idStatus.textContent = `ID сохранен: ${state.so2Id}`;
+                idStatus.className = 'id-status valid';
+            } else {
+                idStatus.textContent = 'ID не указан (требуется для вывода)';
+                idStatus.className = 'id-status invalid';
+            }
+        }
+        
         function setupEventListeners() {
+            // Кликер
             document.getElementById('clickBtn').addEventListener('click', () => {
                 const rublesToAdd = Math.floor(Math.random() * 5) + 1;
                 state.rubles += rublesToAdd;
@@ -274,14 +319,35 @@
                 updateUI();
             });
             
+            // Сохранение ID
+            document.getElementById('saveIdBtn').addEventListener('click', () => {
+                const so2Id = so2IdInput.value.trim();
+                
+                if (/^\d{6,9}$/.test(so2Id)) {  // Проверка что ID состоит из 6-9 цифр
+                    state.so2Id = so2Id;
+                    
+                    if (state.isWebApp) {
+                        Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'set_so2_id',
+                            so2_id: so2Id
+                        }));
+                    }
+                    
+                    updateIdStatus();
+                    alert('ID успешно сохранен!');
+                } else {
+                    alert('Введите корректный ID Standoff 2 (только цифры, 6-9 символов)');
+                }
+            });
+            
+            // Вывод голды
             document.getElementById('withdrawBtn').addEventListener('click', () => {
-                const nickname = document.getElementById('nicknameInput').value.trim();
                 const totalGolda = Object.entries(state.inventory).reduce(
                     (sum, [amount, count]) => sum + parseInt(amount) * count, 0
                 );
                 
-                if (!nickname) {
-                    alert('Введите ваш игровой ник!');
+                if (!state.so2Id) {
+                    alert('Сначала укажите ваш ID Standoff 2!');
                     return;
                 }
                 
@@ -290,11 +356,10 @@
                     return;
                 }
                 
-                if (confirm(`Вывести ${totalGolda} 🟡 на ник ${nickname}?`)) {
+                if (confirm(`Вывести ${totalGolda} 🟡 на ID ${state.so2Id}?`)) {
                     if (state.isWebApp) {
                         Telegram.WebApp.sendData(JSON.stringify({
-                            action: 'withdraw',
-                            nickname: nickname
+                            action: 'withdraw'
                         }));
                     }
                     
