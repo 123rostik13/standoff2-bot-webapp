@@ -5,20 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Standoff 2 Кликер</title>
     <style>
-        /* Ваши стили остаются без изменений */
         :root {
             --primary: #4361ee;
             --secondary: #3f37c9;
             --accent: #4895ef;
             --dark: #2b2d42;
             --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            margin: 0;
+            min-height: 100vh;
             padding: 20px;
+            color: var(--dark);
         }
         
         .container {
@@ -26,10 +34,47 @@
             margin: 0 auto;
         }
         
-        .balance {
-            font-size: 1.5rem;
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
             text-align: center;
-            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .balance-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .balance-card {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 15px;
+            width: 48%;
+            text-align: center;
+        }
+        
+        .balance-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .clicker-section {
+            text-align: center;
+            margin: 30px 0;
         }
         
         .clicker-btn {
@@ -40,67 +85,386 @@
             width: 150px;
             height: 150px;
             font-size: 1.5rem;
-            margin: 0 auto;
-            display: block;
             cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+        }
+        
+        .clicker-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .shop-section {
+            margin-top: 30px;
+        }
+        
+        .shop-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .shop-item-title {
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-buy {
+            background: var(--success);
+        }
+        
+        .btn-buy:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .inventory-section {
+            margin-top: 20px;
+        }
+        
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+        
+        .settings-section {
+            margin-top: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .id-status {
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .valid {
+            color: var(--success);
+        }
+        
+        .invalid {
+            color: var(--warning);
+        }
+        
+        .withdraw-btn {
+            background: var(--warning);
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="balance">
-            💵 Рублей: <span id="rubles">0</span>
+        <header>
+            <h1>🎮 Standoff 2 Кликер</h1>
+            <p>Зарабатывай рубли и покупай голду!</p>
+        </header>
+        
+        <div class="card">
+            <div class="balance-container">
+                <div class="balance-card">
+                    <div>💵 Рублей</div>
+                    <div class="balance-value" id="rubles">0</div>
+                </div>
+                <div class="balance-card">
+                    <div>🟡 Голды</div>
+                    <div class="balance-value" id="golda">0</div>
+                </div>
+            </div>
+            
+            <div class="clicker-section">
+                <button class="clicker-btn" id="clickBtn">КЛИК!</button>
+                <p>+1-5 рублей за каждый клик</p>
+            </div>
         </div>
         
-        <button class="clicker-btn" id="clickBtn">КЛИК!</button>
+        <div class="card shop-section">
+            <h2>🛒 Магазин голды</h2>
+            <div id="shopItems">
+                <!-- Товары будут добавлены через JS -->
+            </div>
+        </div>
+        
+        <div class="card inventory-section">
+            <h2>🎒 Инвентарь</h2>
+            <div id="inventory">
+                <p>Пока ничего нет</p>
+            </div>
+        </div>
+        
+        <div class="card settings-section">
+            <h2>⚙️ Настройки</h2>
+            
+            <div class="form-group">
+                <label for="so2IdInput" class="form-label">Ваш ID в Standoff 2:</label>
+                <input type="text" class="form-input" id="so2IdInput" placeholder="Введите цифровой ID" maxlength="9">
+                <div class="id-status" id="idStatus">Не указан</div>
+            </div>
+            
+            <button class="btn" id="saveIdBtn">Сохранить ID</button>
+            <button class="btn withdraw-btn" id="withdrawBtn">Вывести всю голду</button>
+        </div>
     </div>
 
     <script>
-        // Получаем user_id из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('user_id');
+        // Конфигурация
+        const goldaPackages = {
+            100: { price: 10000 },
+            500: { price: 45000 },
+            1000: { price: 85000 },
+            3000: { price: 240000 }
+        };
         
-        // Элементы интерфейса
+        // Состояние
+        const state = {
+            rubles: 0,
+            golda: 0,
+            so2Id: null,
+            isWebApp: window.Telegram && Telegram.WebApp
+        };
+        
+        // Элементы
         const rublesEl = document.getElementById('rubles');
+        const goldaEl = document.getElementById('golda');
         const clickBtn = document.getElementById('clickBtn');
+        const shopItemsEl = document.getElementById('shopItems');
+        const inventoryEl = document.getElementById('inventory');
+        const so2IdInput = document.getElementById('so2IdInput');
+        const idStatus = document.getElementById('idStatus');
+        const saveIdBtn = document.getElementById('saveIdBtn');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (state.isWebApp) {
+                Telegram.WebApp.expand();
+                Telegram.WebApp.ready();
+            }
+            
+            await loadUserData();
+            renderShop();
+            renderInventory();
+            setupEventListeners();
+        });
         
         // Загрузка данных пользователя
         async function loadUserData() {
             try {
+                const userId = new URLSearchParams(window.location.search).get('user_id');
+                if (!userId) return;
+                
                 const response = await fetch(`/get_user_data?user_id=${userId}`);
+                if (!response.ok) throw new Error('Ошибка загрузки');
+                
                 const data = await response.json();
-                rublesEl.textContent = data.rubles;
+                state.rubles = data.rubles || 0;
+                state.golda = data.golda || 0;
+                state.so2Id = data.so2_id || null;
+                
+                if (state.so2Id) {
+                    so2IdInput.value = state.so2Id;
+                    updateIdStatus();
+                }
+                
+                updateUI();
             } catch (error) {
                 console.error('Ошибка загрузки данных:', error);
+                if (!state.isWebApp) {
+                    state.rubles = 1000; // Для теста вне Telegram
+                    updateUI();
+                }
             }
         }
         
-        // Обработка кликов
-        clickBtn.addEventListener('click', async () => {
-            const rublesToAdd = Math.floor(Math.random() * 5) + 1;
-            
-            if (window.Telegram && Telegram.WebApp) {
-                // Отправляем данные в бота
-                Telegram.WebApp.sendData(JSON.stringify({
-                    action: 'click',
-                    amount: rublesToAdd
-                }));
-            }
-            
-            // Обновляем интерфейс
-            const currentRubles = parseInt(rublesEl.textContent);
-            rublesEl.textContent = currentRubles + rublesToAdd;
-        });
-        
-        // Инициализация
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.expand();
-            Telegram.WebApp.ready();
-            loadUserData();
-        } else {
-            // Режим тестирования без Telegram
-            rublesEl.textContent = 1000;
+        // Обновление интерфейса
+        function updateUI() {
+            rublesEl.textContent = state.rubles;
+            goldaEl.textContent = state.golda;
+            renderShop();
+            renderInventory();
         }
+        
+        // Рендер магазина
+        function renderShop() {
+            shopItemsEl.innerHTML = '';
+            
+            Object.entries(goldaPackages).forEach(([amount, data]) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'shop-item';
+                
+                itemEl.innerHTML = `
+                    <div class="shop-item-title">${amount} 🟡</div>
+                    <div>${data.price.toLocaleString()} ₽</div>
+                    <button class="btn btn-buy" onclick="buyGolda(${amount})" 
+                        ${state.rubles < data.price ? 'disabled' : ''}>
+                        Купить
+                    </button>
+                `;
+                
+                shopItemsEl.appendChild(itemEl);
+            });
+        }
+        
+        // Рендер инвентаря
+        function renderInventory() {
+            if (state.golda > 0) {
+                inventoryEl.innerHTML = `
+                    <div class="inventory-item">
+                        <div>🟡 Голда:</div>
+                        <div>${state.golda}</div>
+                    </div>
+                `;
+            } else {
+                inventoryEl.innerHTML = '<p>Пока ничего нет</p>';
+            }
+        }
+        
+        // Обновление статуса ID
+        function updateIdStatus() {
+            if (state.so2Id) {
+                idStatus.textContent = `ID сохранен: ${state.so2Id}`;
+                idStatus.className = 'id-status valid';
+            } else {
+                idStatus.textContent = 'ID не указан (требуется для вывода)';
+                idStatus.className = 'id-status invalid';
+            }
+        }
+        
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Кликер
+            clickBtn.addEventListener('click', async () => {
+                const rublesToAdd = Math.floor(Math.random() * 5) + 1;
+                state.rubles += rublesToAdd;
+                
+                if (state.isWebApp) {
+                    try {
+                        await Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'click',
+                            amount: rublesToAdd
+                        }));
+                    } catch (error) {
+                        console.error('Ошибка отправки данных:', error);
+                    }
+                }
+                
+                updateUI();
+            });
+            
+            // Сохранение ID
+            saveIdBtn.addEventListener('click', async () => {
+                const so2Id = so2IdInput.value.trim();
+                
+                if (/^\d{6,9}$/.test(so2Id)) {
+                    state.so2Id = so2Id;
+                    
+                    if (state.isWebApp) {
+                        try {
+                            await Telegram.WebApp.sendData(JSON.stringify({
+                                action: 'set_so2_id',
+                                so2_id: so2Id
+                            }));
+                        } catch (error) {
+                            console.error('Ошибка сохранения ID:', error);
+                        }
+                    }
+                    
+                    updateIdStatus();
+                    alert('ID успешно сохранен!');
+                } else {
+                    alert('Введите корректный ID Standoff 2 (6-9 цифр)');
+                }
+            });
+            
+            // Вывод голды
+            withdrawBtn.addEventListener('click', async () => {
+                if (!state.so2Id) {
+                    alert('Сначала укажите ваш ID Standoff 2!');
+                    return;
+                }
+                
+                if (state.golda <= 0) {
+                    alert('Нет голды для вывода!');
+                    return;
+                }
+                
+                if (confirm(`Вывести ${state.golda} 🟡 на ID ${state.so2Id}?`)) {
+                    if (state.isWebApp) {
+                        try {
+                            await Telegram.WebApp.sendData(JSON.stringify({
+                                action: 'withdraw'
+                            }));
+                        } catch (error) {
+                            console.error('Ошибка вывода:', error);
+                        }
+                    }
+                    
+                    state.golda = 0;
+                    updateUI();
+                    alert('Запрос на вывод отправлен!');
+                }
+            });
+        }
+        
+        // Покупка голды
+        window.buyGolda = async function(amount) {
+            const price = goldaPackages[amount].price;
+            
+            if (state.rubles >= price) {
+                state.rubles -= price;
+                state.golda += amount;
+                
+                if (state.isWebApp) {
+                    try {
+                        await Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'buy_golda',
+                            package: amount
+                        }));
+                    } catch (error) {
+                        console.error('Ошибка покупки:', error);
+                    }
+                }
+                
+                updateUI();
+                alert(`Успешно куплено ${amount} 🟡!`);
+            } else {
+                alert('Недостаточно рублей!');
+            }
+        };
     </script>
 </body>
 </html>
