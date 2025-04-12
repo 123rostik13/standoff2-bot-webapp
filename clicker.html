@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standoff 2 Clicker</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        
+        .balance {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }
+        
+        .clicker-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #FF6B00, #FF8A00);
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+            transition: transform 0.1s;
+            margin-bottom: 20px;
+        }
+        
+        .clicker-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .click-info {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="balance">
+        Баланс: <span id="balance">0</span> ₽
+    </div>
+    
+    <button class="clicker-btn" id="clickBtn">КЛИК!</button>
+    <p class="click-info">+1-5 рублей за клик</p>
+
+    <script>
+        const userId = new URLSearchParams(window.location.search).get('user_id');
+        const isWebApp = window.Telegram && Telegram.WebApp;
+        
+        // Загрузка баланса
+        function loadBalance() {
+            if (isWebApp) {
+                document.getElementById('balance').textContent = 
+                    Telegram.WebApp.initDataUnsafe.user?.rubles || 0;
+            } else {
+                // Для теста в браузере
+                document.getElementById('balance').textContent = 1000;
+            }
+        }
+        
+        // Обработчик клика
+        document.getElementById('clickBtn').addEventListener('click', () => {
+            const rubles = Math.floor(Math.random() * 5) + 1;
+            
+            if (isWebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'click',
+                    amount: rubles
+                }));
+            }
+            
+            const balanceEl = document.getElementById('balance');
+            balanceEl.textContent = parseInt(balanceEl.textContent) + rubles;
+        });
+        
+        // Инициализация
+        if (isWebApp) {
+            Telegram.WebApp.expand();
+            Telegram.WebApp.ready();
+        }
+        
+        loadBalance();
+    </script>
+</body>
+</html>
