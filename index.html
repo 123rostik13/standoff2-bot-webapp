@@ -3,192 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standoff 2 Кликер</title>
+    <title>Standoff 2 Clicker</title>
     <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --accent: #4895ef;
-            --dark: #2b2d42;
-            --light: #f8f9fa;
-            --success: #4cc9f0;
-            --warning: #f8961e;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+            margin: 0;
             padding: 20px;
-            color: var(--dark);
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        header {
-            background: var(--primary);
+            background: #121212;
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .balance-container {
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .balance-card {
-            background: var(--light);
-            border-radius: 8px;
-            padding: 15px;
-            width: 48%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             text-align: center;
         }
-        .balance-value {
+        
+        .balance {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }
+        
+        .clicker-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #FF6B00, #FF8A00);
+            border: none;
+            color: white;
             font-size: 1.8rem;
             font-weight: bold;
-            margin-top: 5px;
-        }
-        .clicker-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 150px;
-            height: 150px;
-            font-size: 1.5rem;
             cursor: pointer;
-            margin: 20px auto;
-            display: block;
-            transition: transform 0.2s;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+            transition: transform 0.1s;
+            margin-bottom: 20px;
         }
+        
         .clicker-btn:active {
             transform: scale(0.95);
         }
-        .shop-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 15px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-buy {
-            background: var(--success);
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        
+        .click-info {
+            color: #aaa;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎮 Standoff 2 Кликер</h1>
-            <p>Зарабатывай рубли и покупай голду!</p>
-        </header>
-        
-        <div class="card">
-            <div class="balance-container">
-                <div class="balance-card">
-                    <div>💵 Рублей</div>
-                    <div class="balance-value">0</div>
-                </div>
-                <div class="balance-card">
-                    <div>🟡 Голды</div>
-                    <div class="balance-value">0</div>
-                </div>
-            </div>
-            
-            <button class="clicker-btn" onclick="Telegram.WebApp.sendData(JSON.stringify({action: 'click'}))">
-                КЛИК!
-            </button>
-            <p style="text-align: center;">+1-5 рублей за клик</p>
-        </div>
-        
-        <div class="card">
-            <h2>🛒 Магазин голды</h2>
-            <div>
-                <div class="shop-item">
-                    <div>100 🟡</div>
-                    <div>10,000 ₽</div>
-                    <button class="btn btn-buy" onclick="Telegram.WebApp.sendData(JSON.stringify({action: 'buy_golda', package: 100}))">
-                        Купить
-                    </button>
-                </div>
-                <div class="shop-item">
-                    <div>500 🟡</div>
-                    <div>45,000 ₽</div>
-                    <button class="btn btn-buy" onclick="Telegram.WebApp.sendData(JSON.stringify({action: 'buy_golda', package: 500}))">
-                        Купить
-                    </button>
-                </div>
-                <div class="shop-item">
-                    <div>1000 🟡</div>
-                    <div>85,000 ₽</div>
-                    <button class="btn btn-buy" onclick="Telegram.WebApp.sendData(JSON.stringify({action: 'buy_golda', package: 1000}))">
-                        Купить
-                    </button>
-                </div>
-                <div class="shop-item">
-                    <div>3000 🟡</div>
-                    <div>240,000 ₽</div>
-                    <button class="btn btn-buy" onclick="Telegram.WebApp.sendData(JSON.stringify({action: 'buy_golda', package: 3000}))">
-                        Купить
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h2>⚙️ Настройки</h2>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px;">Ваш ID Standoff 2:</label>
-                <input type="text" id="so2IdInput" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                <button class="btn" style="margin-top: 10px;" 
-                        onclick="Telegram.WebApp.sendData(JSON.stringify({
-                            action: 'set_so2_id',
-                            so2_id: document.getElementById('so2IdInput').value
-                        }))">
-                    Сохранить ID
-                </button>
-            </div>
-            <button class="btn" style="background: var(--warning); width: 100%;"
-                    onclick="Telegram.WebApp.sendData(JSON.stringify({action: 'withdraw'}))">
-                Вывести голду
-            </button>
-        </div>
+    <div class="balance">
+        Баланс: <span id="balance">0</span> ₽
     </div>
+    
+    <button class="clicker-btn" id="clickBtn">КЛИК!</button>
+    <p class="click-info">+1-5 рублей за клик</p>
 
     <script>
-        // Минимальная инициализация WebApp
-        if (window.Telegram && Telegram.WebApp) {
+        const userId = new URLSearchParams(window.location.search).get('user_id');
+        const isWebApp = window.Telegram && Telegram.WebApp;
+        
+        // Загрузка баланса
+        function loadBalance() {
+            if (isWebApp) {
+                document.getElementById('balance').textContent = 
+                    Telegram.WebApp.initDataUnsafe.user?.rubles || 0;
+            } else {
+                // Для теста в браузере
+                document.getElementById('balance').textContent = 1000;
+            }
+        }
+        
+        // Обработчик клика
+        document.getElementById('clickBtn').addEventListener('click', () => {
+            const rubles = Math.floor(Math.random() * 5) + 1;
+            
+            if (isWebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'click',
+                    amount: rubles
+                }));
+            }
+            
+            const balanceEl = document.getElementById('balance');
+            balanceEl.textContent = parseInt(balanceEl.textContent) + rubles;
+        });
+        
+        // Инициализация
+        if (isWebApp) {
             Telegram.WebApp.expand();
             Telegram.WebApp.ready();
         }
+        
+        loadBalance();
     </script>
 </body>
 </html>
